@@ -1,0 +1,104 @@
+---
+title: 'Project 2: Cyclistic Full Year Analysis Using R'
+author: "Mostafa Istanbuli"
+date: "21/05/2021"
+output:
+  pdf_document: default
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Cyclistic Full Year Analysis
+
+### Overview 
+This analysis is for case study 1 from the Google Data Analytics Certificate (Cyclistic).
+
+The purpose of this script is to consolidate downloaded Cyclistic data into a single dataframe and then conduct simple analysis to help answer the key question:
+
+* In what ways do members and casual riders use Divvy bikes differently?
+
+* Why would casual riders buy Cyclistic annual memberships? 
+
+* How can Cyclistic use digital media to influence casual riders to become members?
+
+### Step 1:Getting started
+First we will need to install and load required packages: tidyverse,libridate,ggplot 
+
+```{r Loading Packages}
+library('tidyverse')
+library('lubridate')  
+library('ggplot2')
+```
+
+### Step 2: Collect and combine data 
+All data tables to be examined were imported using the R import wizard, now the tables need to be assigned a different name
+
+```{r Assigning Names to Tables}
+Apr_2020 <- X202004_divvy_tripdata
+May_2020 <- X202005_divvy_tripdata
+June_2020 <- X202006_divvy_tripdata
+July_2020 <- X202007_divvy_tripdata
+Aug_2020 <- X202008_divvy_tripdata
+Sep_2020 <- X202009_divvy_tripdata
+Oct_2020 <- X202010_divvy_tripdata
+Nov_2020 <- X202011_divvy_tripdata
+Dec_2020 <- X202012_divvy_tripdata
+Jan_2021 <- X202101_divvy_tripdata
+Feb_2021 <- X202102_divvy_tripdata
+Mar_2021 <- X202103_divvy_tripdata
+Apr_2021 <- X202104_divvy_tripdata
+```
+
+Before combining the data tables together check if all column names match
+
+```{r Checking column names}
+colnames(Apr_2020)
+colnames(May_2020)
+colnames(June_2020)
+colnames(July_2020)
+colnames(Aug_2020)
+colnames(Sep_2020)
+colnames(Oct_2020)
+colnames(Nov_2020)
+colnames(Dec_2020)
+colnames(Jan_2021)
+colnames(Feb_2021)
+colnames(Mar_2021)
+colnames(Apr_2021)
+```
+
+Now check for data type if all column types match, in this case everything was converted on excel before importing except for start_station_id and end_station_id.So we convert start_station_id and end_station_id to data type 'character' to enable combining the tables
+
+```{r, Adjusting Data Type}
+Apr_2020 <- mutate(Apr_2020, start_station_id = as.character(start_station_id),
+                   end_station_id = as.character(end_station_id))
+May_2020 <- mutate(May_2020, start_station_id = as.character(start_station_id),
+                   end_station_id = as.character(end_station_id))
+June_2020 <- mutate(June_2020, start_station_id = as.character(start_station_id),
+                    end_station_id = as.character(end_station_id))
+July_2020 <- mutate(July_2020, start_station_id = as.character(start_station_id),
+                    end_station_id = as.character(end_station_id))
+Aug_2020 <- mutate(Aug_2020, start_station_id = as.character(start_station_id),
+                   end_station_id = as.character(end_station_id))
+Sep_2020 <- mutate(Sep_2020, start_station_id = as.character(start_station_id),
+                   end_station_id = as.character(end_station_id))
+Oct_2020 <- mutate(Oct_2020, start_station_id = as.character(start_station_id),
+                   end_station_id = as.character(end_station_id))
+Nov_2020 <- mutate(Nov_2020, start_station_id = as.character(start_station_id),
+                   end_station_id = as.character(end_station_id))
+Dec_2020 <- mutate(Dec_2020, start_station_id = as.character(start_station_id),
+                   end_station_id = as.character(end_station_id))
+Jan_2021 <- mutate(Jan_2021, start_station_id = as.character(start_station_id),
+                   end_station_id = as.character(end_station_id))
+Feb_2021 <- mutate(Feb_2021, start_station_id = as.character(start_station_id),
+                   end_station_id = as.character(end_station_id))
+Mar_2021 <- mutate(Mar_2021, start_station_id = as.character(start_station_id),
+                   end_station_id = as.character(end_station_id))
+Apr_2021 <- mutate(Apr_2021, start_station_id = as.character(start_station_id),
+                   end_station_id = as.character(end_station_id))
+```
+
+
