@@ -1,0 +1,284 @@
+---
+title: 'Project 2: Cyclistic Full Year Analysis Using R'
+author: "Mostafa Istanbuli"
+date: "21/05/2021"
+output:
+  pdf_document: default
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Cyclistic Full Year Analysis
+
+### Overview 
+This analysis is for case study 1 from the Google Data Analytics Certificate (Cyclistic).
+
+The purpose of this script is to consolidate downloaded Cyclistic data into a single dataframe and then conduct simple analysis to help answer the key question:
+
+* In what ways do members and casual riders use Cyclistic bikes differently?
+
+* Why would casual riders buy Cyclistic annual memberships? 
+
+* How can Cyclistic use digital media to influence casual riders to become members?
+
+### Step 1:Getting started
+First we will need to install and load required packages: tidyverse,lubridate,ggplot2 
+
+```{r Loading Packages}
+library('tidyverse')
+library('lubridate')  
+library('ggplot2')
+```
+
+### Step 2: Collect and combine data 
+All data tables to be examined were imported using the R import wizard, now the tables need to be assigned a different name
+
+```{r Assigning Names to Tables}
+Apr_2020 <- X202004_divvy_tripdata
+May_2020 <- X202005_divvy_tripdata
+June_2020 <- X202006_divvy_tripdata
+July_2020 <- X202007_divvy_tripdata
+Aug_2020 <- X202008_divvy_tripdata
+Sep_2020 <- X202009_divvy_tripdata
+Oct_2020 <- X202010_divvy_tripdata
+Nov_2020 <- X202011_divvy_tripdata
+Dec_2020 <- X202012_divvy_tripdata
+Jan_2021 <- X202101_divvy_tripdata
+Feb_2021 <- X202102_divvy_tripdata
+Mar_2021 <- X202103_divvy_tripdata
+Apr_2021 <- X202104_divvy_tripdata
+```
+
+Before combining the data tables together check if all column names match
+
+```{r Checking column names}
+colnames(Apr_2020)
+colnames(May_2020)
+colnames(June_2020)
+colnames(July_2020)
+colnames(Aug_2020)
+colnames(Sep_2020)
+colnames(Oct_2020)
+colnames(Nov_2020)
+colnames(Dec_2020)
+colnames(Jan_2021)
+colnames(Feb_2021)
+colnames(Mar_2021)
+colnames(Apr_2021)
+```
+
+Now check for data type if all column types match, in this case everything was 
+converted on excel before importing except for start_station_id and 
+end_station_id.So we convert start_station_id and end_station_id to data type 
+'character' to enable combining the tables
+
+```{r, Adjusting Data Type}
+Apr_2020 <- mutate(Apr_2020, start_station_id = as.character(start_station_id),
+                   end_station_id = as.character(end_station_id))
+May_2020 <- mutate(May_2020, start_station_id = as.character(start_station_id),
+                   end_station_id = as.character(end_station_id))
+June_2020 <- mutate(June_2020, start_station_id = as.character(start_station_id),
+                    end_station_id = as.character(end_station_id))
+July_2020 <- mutate(July_2020, start_station_id = as.character(start_station_id),
+                    end_station_id = as.character(end_station_id))
+Aug_2020 <- mutate(Aug_2020, start_station_id = as.character(start_station_id),
+                   end_station_id = as.character(end_station_id))
+Sep_2020 <- mutate(Sep_2020, start_station_id = as.character(start_station_id),
+                   end_station_id = as.character(end_station_id))
+Oct_2020 <- mutate(Oct_2020, start_station_id = as.character(start_station_id),
+                   end_station_id = as.character(end_station_id))
+Nov_2020 <- mutate(Nov_2020, start_station_id = as.character(start_station_id),
+                   end_station_id = as.character(end_station_id))
+Dec_2020 <- mutate(Dec_2020, start_station_id = as.character(start_station_id),
+                   end_station_id = as.character(end_station_id))
+Jan_2021 <- mutate(Jan_2021, start_station_id = as.character(start_station_id),
+                   end_station_id = as.character(end_station_id))
+Feb_2021 <- mutate(Feb_2021, start_station_id = as.character(start_station_id),
+                   end_station_id = as.character(end_station_id))
+Mar_2021 <- mutate(Mar_2021, start_station_id = as.character(start_station_id),
+                   end_station_id = as.character(end_station_id))
+Apr_2021 <- mutate(Apr_2021, start_station_id = as.character(start_station_id),
+                   end_station_id = as.character(end_station_id))
+```
+
+### Step 3: Clean and Prepare data for analysis
+
+Remove non-required columns such as start_lat, start_lng, end_lat, end_lng. 
+
+```{r Removing Columns}
+all_trips <- all_trips %>% 
+  select(-c(start_lat, start_lng, end_lat, end_lng))
+```
+
+Inspect new table created
+
+```{r Inspect compiled table}
+colnames(all_trips)
+nrow(all_trips)
+dim(all_trips)
+head(all_trips)
+str(all_trips)
+summary(all_trips)
+```
+
+Since the data can only be aggregated at the ride-level, which is too granular. 
+We will want to add some additional columns to the table 
+such as day, month, year which will provide additional opportunities 
+to aggregate the data and provide more insight. 
+
+Below code chunk will allow us to aggregate ride data for each month, day, or 
+year
+
+```{r Creating new columns for day,month,year}
+all_trips$date <- as.Date(all_trips$started_at) #The default format is yyyy-mm-dd
+all_trips$month <- format(as.Date(all_trips$date), "%m")
+all_trips$day <- format(as.Date(all_trips$date), "%d")
+all_trips$year <- format(as.Date(all_trips$date), "%Y")
+all_trips$day_of_week <- format(as.Date(all_trips$date), "%A")
+```
+
+Next the duration of the ride is calculated as "ride_length" to all_trips 
+(in seconds)
+
+```{r Calculating ride duration}
+all_trips$ride_length <- difftime(all_trips$ended_at,all_trips$started_at)
+```
+
+Convert "ride_length" from factor to numeric so we can run 
+calculations on the data. You will see when code chunk below is executed the 
+result will begin with a 'FALSE' and then changes to 'TRUE' confirming the 
+conversion from factor to numeric.
+
+```{r Converting from Factor to Numeric}
+is.factor(all_trips$ride_length)
+
+all_trips$ride_length <- as.numeric(as.character(all_trips$ride_length))
+
+is.numeric(all_trips$ride_length)
+```
+
+
+Remove bad data
+
+The data frame includes a few hundred entries when bikes were taken out of docks 
+and checked for quality by Cyclistic which resulted in negative ride_length 
+
+```{r Filtering and Viewing Bad data}
+negative_ride_length <- all_trips %>% filter(ride_length < 0)
+View(negative_ride_length)
+```
+
+
+We will create a new version of the data frame (v2) since data with 
+negative values are being removed
+
+```{r Removing negative values}
+all_trips_v2 <- all_trips[!(all_trips$start_station_name == "HQ QR" | all_trips$ride_length<0),]
+```
+
+Recheck for any negative values, none exist
+
+```{r Check for data removal}
+negative_ride_length_v2 <- all_trips_v2 %>% filter(ride_length < 0)
+View(negative_ride_length_v2)
+```
+
+### Step 4: Conduct Analysis
+
+Descriptive analysis on ride_length (all figures in seconds)
+The code chunk provides data frame mean, median, min, and max
+
+```{r Initial Summary}
+summary(all_trips_v2$ride_length)
+```
+
+
+Now we move on to Compare members and casual users with ride_length (seconds)
+```{r User type vs ride length}
+aggregate(all_trips_v2$ride_length ~ all_trips_v2$member_casual, FUN = mean)
+aggregate(all_trips_v2$ride_length ~ all_trips_v2$member_casual, FUN = median)
+aggregate(all_trips_v2$ride_length ~ all_trips_v2$member_casual, FUN = max)
+aggregate(all_trips_v2$ride_length ~ all_trips_v2$member_casual, FUN = min)
+```
+
+
+See the average ride time by each day for members vs casual users
+```{r User type vs Avg ride time per day}
+aggregate(all_trips_v2$ride_length ~ all_trips_v2$member_casual + all_trips_v2$day_of_week, FUN = mean)
+```
+
+Order results per weekdays
+```{r Order Per Weekdays}
+all_trips_v2$day_of_week <- ordered(all_trips_v2$day_of_week, 
+levels=c("Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"))
+```
+
+Rerun code to get ordered data
+```{r User type vs Avg ride time per day(ordered) }
+aggregate(all_trips_v2$ride_length ~ all_trips_v2$member_casual + all_trips_v2$day_of_week, FUN = mean)
+```
+
+Analyze ridership data by type and weekday
+```{r ridership data by type and weekday}
+all_trips_v2 %>% 
+  mutate(weekday = wday(started_at, label = TRUE)) %>%  #creates weekday field using wday()
+  group_by(member_casual, weekday) %>%  #groups by usertype and weekday
+  summarise(number_of_rides = n()							#calculates the number of rides and average duration 
+            ,average_duration = mean(ride_length)) %>% 		# calculates the average duration
+  arrange(member_casual, weekday)
+```
+
+
+### Step 5: Data Visualization
+
+After completing all the analysis required now the Data Visualizing phase starts
+and the following visualizations will be prepared:
+
+* Number of rides by rider type
+* Average trip duration by weekday
+
+
+```{r Viz 1}
+all_trips_v2 %>% 
+  mutate(weekday = wday(started_at, label = TRUE)) %>% 
+  group_by(member_casual, weekday) %>% 
+  summarise(number_of_rides = n()
+            ,average_duration = mean(ride_length)) %>% 
+  arrange(member_casual, weekday)  %>%
+  filter(member_casual != 'NA') %>%
+  ggplot(aes(x = weekday, y = number_of_rides, fill = member_casual)) +
+  geom_col(position = "dodge")
+```
+
+```{r Viz 2}
+all_trips_v2 %>% 
+  mutate(weekday = wday(started_at, label = TRUE)) %>% 
+  group_by(member_casual, weekday) %>% 
+  summarise(number_of_rides = n()
+            ,average_duration = mean(ride_length)) %>% 
+  arrange(member_casual, weekday)  %>%
+  filter(member_casual != 'NA') %>%
+  ggplot(aes(x = weekday, y = average_duration, fill = member_casual)) +
+  geom_col(position = "dodge")
+```
+
+
+### Step 6 : Share findings
+
+After conducting the analysis and creating some visuals the following trends and 
+findings can be spotted:
+
+* Ride duration of casual users tend to be longer than Cyclistic members. This 
+trend highly suggests that casual users tend to use the bikes for pleasure such as 
+sight seeing and city exploration hence the longer trip durations. On the other hand
+members are likely using the bikes for work or goal oriented purposes such as 
+commuting to work hence the lower ride durations.
+
+* Members tend to have more number of rides compared to casual users. Also the number
+of rides fora casual users is at the peak during weekends compared to a much more 
+consistent number of rides throughtout the week from Cyclistic members. 
+ 
+
