@@ -7,5 +7,5 @@ This project will be conducted on a dataset recording COVID-19 Deaths. The proje
 ## Project 2:  Cyclistic Full Year Analysis Using R
 This project is the Capstone project for Data Analytics Certificate provided by Google. The case study involves a bike-share company named Cyclistic and in this case study, I will perform many real-world tasks of a junior data analyst in order to answer the key business questions. The following steps of the data analysis process will be followed: ask, prepare, process, analyze, share, and act.
 
-## Project 3:  Cyclistic Full Year Analysis Using R
+## Project 3:  Data Cleaning Using SQL
 This project is focused towards showcasing skills used in SQL to generate clean data. 6 diffrent cleaning steps were conducted on the dataset to provides maximum analytical results once the dataset is used. 
