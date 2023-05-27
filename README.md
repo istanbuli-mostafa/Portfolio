@@ -1,5 +1,5 @@
 # Portfolio
-This Personal portfolio is compromised of couple of projects to showcase my skills in SQL and R. Please feel free to further connect and provide your opinion on the work I've done and please make sure to revisit my protfolio as I will always keep adding new projects to it. 
+This Personal portfolio is compromised of couple of projects to showcase my skills in SQL,Python,& R. Please feel free to further connect and provide your opinion on the work I've done and please make sure to revisit my protfolio as I will always keep adding new projects to it. 
 
 ## Project 1:  Data Cleaning Using SQL
 This project is focused towards showcasing skills used in SQL to generate clean data. 6 diffrent cleaning steps were conducted on the dataset to provides maximum analytical results once the dataset is used. \
